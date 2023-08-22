@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package inn_service.model.v1;
+
+option go_package = "github.com/POMBNK/shtrafovNetTestTask/gen/go/proto/inn_service/model/v1";
+
+
+message Company {
+  string Inn = 1;
+  string Kpp = 2;
+  string CompanyName = 3;
+  string Fio = 4;
+}
+
