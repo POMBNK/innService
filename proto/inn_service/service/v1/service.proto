@@ -2,13 +2,19 @@ syntax = "proto3";
 
 package inn_service.service.v1;
 
-option go_package = "github.com/POMBNK/shtrafovNetTestTask/gen/go/proto/inn_service/service/v1";
+option go_package = "github.com/POMBNK/shtrafovNetTestTask/gen/go/inn_service/service/v1";
 
 import "inn_service/model/v1/company.proto";
+import "google/api/annotations.proto";
 
 service CompanyService {
-  rpc GetCompany(GetCompanyRequest) returns (GetCompanyResponse) {}
-}
+  rpc GetCompany(GetCompanyRequest) returns (GetCompanyResponse) {
+   option (google.api.http) = {
+     post: "/v1/get_company"
+     body: "*"
+   };
+ }
+};
 
 message GetCompanyRequest {
   string Inn = 1;
