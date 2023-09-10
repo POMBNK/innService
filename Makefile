@@ -9,5 +9,4 @@ proto:
 		   --go-grpc_out=gen/go --go-grpc_opt=paths=source_relative \
 		   --grpc-gateway_out=gen/go/ --grpc-gateway_opt=paths=source_relative \
 		   proto/inn_service/service/v1/*.proto
-
 .PHONY: proto 

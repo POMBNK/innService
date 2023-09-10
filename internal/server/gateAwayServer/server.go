@@ -3,7 +3,7 @@ package gateAwayServer
 import (
 	"context"
 	protoCompanyService "github.com/POMBNK/shtrafovNetTestTask/gen/go/inn_service/service/v1"
-	"github.com/POMBNK/shtrafovNetTestTask/internal/controller/grpc/v1/company_service"
+	"github.com/POMBNK/shtrafovNetTestTask/internal/controller/grpc/v1/company"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
@@ -35,7 +35,7 @@ func (s *Server) Start() error {
 
 	protoCompanyService.RegisterCompanyServiceServer(
 		grpcServer,
-		company_service.NewCompanyServer(protoCompanyService.UnimplementedCompanyServiceServer{}),
+		company.NewCompanyServer(protoCompanyService.UnimplementedCompanyServiceServer{}),
 	)
 
 	mux := runtime.NewServeMux()

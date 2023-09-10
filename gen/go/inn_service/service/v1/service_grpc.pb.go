@@ -4,7 +4,7 @@
 // - protoc             v3.15.8
 // source: inn_service/service/v1/service.proto
 
-package v1
+package protoCompanyService
 
 import (
 	context "context"
