@@ -1,25 +1,17 @@
 package main
 
 import (
-	"github.com/POMBNK/shtrafovNetTestTask/internal/server/gateAwayServer"
+	"context"
+	"github.com/POMBNK/shtrafovNetTestTask/internal/app"
 	"log"
 )
 
 func main() {
-	//rprofile := rusprofile.NewClient()
-	//page, err := rprofile.ParsePage("inn_number")
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
-	//resp, err := rprofile.ParseInfo(page)
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
-	//
-	//fmt.Println(resp)
-	server := gateAwayServer.NewServer()
-	err := server.Start()
-	if err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	a := app.NewApp(ctx)
+	if err := a.Start(ctx); err != nil {
 		log.Fatalln(err)
 	}
 }
