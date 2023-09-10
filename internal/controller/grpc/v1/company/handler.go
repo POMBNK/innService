@@ -10,5 +10,12 @@ func (s *Server) GetCompany(
 	req *protoCompanyService.GetCompanyRequest,
 ) (*protoCompanyService.GetCompanyResponse, error) {
 
-	return nil, nil
+	company, err := s.policy.GetCompanyByInn(ctx, req.Inn)
+	if err != nil {
+		return nil, err
+	}
+
+	response := NewGetCompanyResponse(company)
+
+	return response, nil
 }
