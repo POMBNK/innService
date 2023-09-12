@@ -10,14 +10,13 @@ import "google/api/annotations.proto";
 service CompanyService {
   rpc GetCompany(GetCompanyRequest) returns (GetCompanyResponse) {
    option (google.api.http) = {
-     post: "/v1/get_company"
-     body: "*"
+     get: "/v1/get_company/{inn}"
    };
  }
 };
 
 message GetCompanyRequest {
-  string Inn = 1;
+  string inn = 1;
 }
 
 message GetCompanyResponse {

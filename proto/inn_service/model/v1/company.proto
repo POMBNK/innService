@@ -6,9 +6,9 @@ option go_package = "github.com/POMBNK/shtrafovNetTestTask/gen/go/inn_service/mo
 
 
 message Company {
-  string Inn = 1;
-  string Kpp = 2;
-  string CompanyName = 3;
-  string Fio = 4;
+  string inn = 1;
+  string kpp = 2;
+  string companyName = 3;
+  string fio = 4;
 }
 
