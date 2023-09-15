@@ -8,6 +8,7 @@ import (
 	grpcCompanyServer "github.com/POMBNK/shtrafovNetTestTask/internal/controller/grpc/v1/company"
 	"github.com/POMBNK/shtrafovNetTestTask/internal/domain/company/service"
 	"github.com/POMBNK/shtrafovNetTestTask/internal/domain/policy/company"
+	"github.com/POMBNK/shtrafovNetTestTask/pkg/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/sync/errgroup"
@@ -35,7 +36,9 @@ type App struct {
 }
 
 func NewApp(ctx context.Context) App {
+	logger.L(ctx).Info("Router initialization...")
 	router := httprouter.New()
+
 	companyService := service.NewService()
 	companyPolicy := company.NewPolicy(companyService)
 	companyServer := grpcCompanyServer.NewServer(companyPolicy, protoCompanyService.UnimplementedCompanyServiceServer{})
@@ -49,11 +52,12 @@ func NewApp(ctx context.Context) App {
 func (a *App) Start(ctx context.Context) error {
 	grp, ctx := errgroup.WithContext(ctx)
 
-	fmt.Println("Starting http server...")
+	logger.L(ctx).Info("Starting http server...")
 	grp.Go(func() error {
 		return a.startHTTP(ctx)
 	})
-	fmt.Println("Starting grpc server...")
+
+	logger.L(ctx).Info("Starting grpc server...")
 	grp.Go(func() error {
 		return a.startGRPC(ctx, a.companyServer)
 	})
@@ -80,15 +84,15 @@ func (a *App) startHTTP(ctx context.Context) error {
 	if err = a.httpServer.Serve(listener); err != nil {
 		switch {
 		case errors.Is(err, http.ErrServerClosed):
-			log.Println("server shutdown")
+			logger.L(ctx).Warn("http server closed")
 		default:
-			log.Fatalln("failed to start server")
+			logger.WithError(ctx, err).Fatal("failed to start server")
 		}
 	}
 
 	err = a.httpServer.Shutdown(context.Background())
 	if err != nil {
-		log.Fatalln("failed to shutdown server")
+		logger.WithError(ctx, err).Fatal("failed to shutdown server")
 	}
 
 	return err
@@ -97,14 +101,14 @@ func (a *App) startHTTPGateAway(ctx context.Context) error {
 
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", loopback, httpGateAwayPort))
 	if err != nil {
-		log.Fatalln(err)
+		logger.WithError(ctx, err).Fatal("failed to create listener")
 	}
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	err = protoCompanyService.RegisterCompanyServiceHandlerFromEndpoint(ctx, mux, fmt.Sprintf("%s:%s", loopback, grpcHostPort), opts)
 	if err != nil {
-		log.Fatalln(err)
+		logger.WithError(ctx, err).Fatal("failed to register handler from endpoint grpc gateway")
 	}
 
 	a.httpServer = &http.Server{
@@ -116,15 +120,15 @@ func (a *App) startHTTPGateAway(ctx context.Context) error {
 	if err = a.httpServer.Serve(listener); err != nil {
 		switch {
 		case errors.Is(err, http.ErrServerClosed):
-			log.Println("server shutdown")
+			logger.L(ctx).Warn("server shutdown")
 		default:
-			log.Fatalln("failed to start server")
+			logger.WithError(ctx, err).Fatal("failed to start server")
 		}
 	}
 
 	err = a.httpServer.Shutdown(context.Background())
 	if err != nil {
-		log.Fatalln("failed to shutdown server")
+		logger.WithError(ctx, err).Fatal("failed to shutdown server")
 	}
 
 	return err
@@ -132,24 +136,9 @@ func (a *App) startHTTPGateAway(ctx context.Context) error {
 
 func (a *App) startGRPC(ctx context.Context, server protoCompanyService.CompanyServiceServer) error {
 
-	//listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", loopback, grpcHostPort))
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
-	//
-	//var serverOptions []grpc.ServerOption
-	//
-	//a.grpcServer = grpc.NewServer(serverOptions...)
-	//
-	//protoCompanyService.RegisterCompanyServiceServer(a.grpcServer, server)
-	//
-	//reflection.Register(a.grpcServer)
-	//
-	//return a.grpcServer.Serve(listener)
-
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", loopback, grpcHostPort))
 	if err != nil {
-		log.Fatalln(err)
+		logger.WithError(ctx, err).Fatal("failed to create listener")
 	}
 
 	var serverOptions []grpc.ServerOption
@@ -157,13 +146,6 @@ func (a *App) startGRPC(ctx context.Context, server protoCompanyService.CompanyS
 
 	protoCompanyService.RegisterCompanyServiceServer(a.grpcServer, server)
 	reflection.Register(a.grpcServer)
-	//mux := runtime.NewServeMux()
-	//
-	//opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	//err = protoCompanyService.RegisterCompanyServiceHandlerFromEndpoint(ctx, mux, fmt.Sprintf("%s:%s", loopback, grpcHostPort), opts)
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
 
 	return a.grpcServer.Serve(listener)
 

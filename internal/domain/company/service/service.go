@@ -29,6 +29,7 @@ func (s *CompanyService) GetCompanyByInn(ctx context.Context, inn string) (model
 		info.Inn,
 		info.Kpp,
 		info.CompanyName,
-		info.Fio), nil
+		info.Fio,
+	), nil
 
 }
