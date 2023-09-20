@@ -6,6 +6,9 @@ import (
 	"github.com/POMBNK/shtrafovNetTestTask/pkg/logger"
 )
 
+// TODO: add swagger doc
+// TODO: add tests
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
