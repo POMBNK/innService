@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	loopback         = "127.0.0.1"
+	loopback         = "0.0.0.0"
 	grpcHostPort     = "8082"
 	httpGateAwayPort = "8081"
 	httpHostPort     = "8080"
